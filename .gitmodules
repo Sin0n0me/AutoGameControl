@@ -1,0 +1,3 @@
+[submodule "EmulateForWindows/vJoy"]
+	path = EmulateForWindows/vJoy
+	url = git@github.com:shauleiz/vJoy.git

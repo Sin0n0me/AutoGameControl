@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\Common\Common.cpp">
+      <Filter>Commoon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\AutoOperator.cpp">
+      <Filter>Commoon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\CommandSeparater.cpp">
+      <Filter>Commoon</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoGamePadOperatorForWIndows.cpp" />
+    <ClCompile Include="AutoKeyboardOperatorForWindows.cpp" />
+    <ClCompile Include="AutoMouseOperatorForWindows.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Commoon">
+      <UniqueIdentifier>{8df57a04-f983-4e0d-b039-060df8f873b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Common.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\AutoOperator.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\CommandSeparater.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Hash.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IntAutoGamePadOperator.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IntAutoKeyboardOperator.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IntAutoMouseOperator.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\IntAutoOperator.hpp">
+      <Filter>Commoon</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoGamePadOperatorForWIndows.h" />
+    <ClInclude Include="AutoKeyboardOperatorForWindows.h" />
+    <ClInclude Include="AutoMouseOperatorForWindows.h" />
+  </ItemGroup>
+</Project>
