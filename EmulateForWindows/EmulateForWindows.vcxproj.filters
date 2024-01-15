@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="..\Common\Common.cpp">
       <Filter>Commoon</Filter>
     </ClCompile>
@@ -11,13 +10,23 @@
     <ClCompile Include="..\Common\CommandSeparater.cpp">
       <Filter>Commoon</Filter>
     </ClCompile>
-    <ClCompile Include="AutoGamePadOperatorForWIndows.cpp" />
-    <ClCompile Include="AutoKeyboardOperatorForWindows.cpp" />
-    <ClCompile Include="AutoMouseOperatorForWindows.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="AutoGamePadOperatorForWIndows.cpp">
+      <Filter>Windwos</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoKeyboardOperatorForWindows.cpp">
+      <Filter>Windwos</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoMouseOperatorForWindows.cpp">
+      <Filter>Windwos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Commoon">
       <UniqueIdentifier>{8df57a04-f983-4e0d-b039-060df8f873b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windwos">
+      <UniqueIdentifier>{7d14cb45-ebec-40de-9715-bca84d6c86ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,8 +54,14 @@
     <ClInclude Include="..\Common\IntAutoOperator.hpp">
       <Filter>Commoon</Filter>
     </ClInclude>
-    <ClInclude Include="AutoGamePadOperatorForWIndows.h" />
-    <ClInclude Include="AutoKeyboardOperatorForWindows.h" />
-    <ClInclude Include="AutoMouseOperatorForWindows.h" />
+    <ClInclude Include="AutoGamePadOperatorForWIndows.h">
+      <Filter>Windwos</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoKeyboardOperatorForWindows.h">
+      <Filter>Windwos</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoMouseOperatorForWindows.h">
+      <Filter>Windwos</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
