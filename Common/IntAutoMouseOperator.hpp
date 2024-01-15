@@ -5,8 +5,8 @@
 class IntAutoMouseOperator : public IntAutoOperator {
 public:
 	virtual ~IntAutoMouseOperator(void) noexcept = default;
-	virtual void onCommandMouseClick(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
-	virtual void onCommandMouseCursor(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
-	virtual void onCommandMouseScroll(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
+	virtual void onCommandMouseClick(const CommonAutoOperator::ElapsedTime& elapsedTime, const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
+	virtual void onCommandMouseCursor(const CommonAutoOperator::ElapsedTime& elapsedTime, const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
+	virtual void onCommandMouseScroll(const CommonAutoOperator::ElapsedTime& elapsedTime, const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
 };
 #endif

@@ -6,31 +6,31 @@ using namespace CommandSeparator;
 
 std::tuple<Commands::StartTime, Commands::Command, Commands::Args> Commands::getCommand(const Common::CommandLine& line) {
 	Commands::StartTime startTime = -1;
-	Commands::Command command = "";
+	Commands::Command command;
 	Commands::Args args;
 
 	// コマンドの定義に従っているかチェック
-	const auto semicolon_pos = line.find(';');
-	if(semicolon_pos == std::string::npos && line.find(':') == std::string::npos) {
+	const auto semicolonPos = line.find(';');
+	if(semicolonPos == std::string::npos && line.find(':') == std::string::npos) {
 		return std::make_tuple(startTime, command, args);
 	}
 
 	// 開始時間, コマンド, 引数に分割する
 	// セミコロンがない場合は条件式
 	std::string fullCommand;
-	if(semicolon_pos == std::string::npos) {
+	if(semicolonPos == std::string::npos) {
 		fullCommand = line;
 	} else {
-		const std::regex time_match(R"(^(\d+):(\d+).(\d+)$)");
-		const std::string startTimeString = line.substr(0, semicolon_pos);
+		const std::regex timeMatch(R"(^(\d+):(\d+).(\d+)$)");	//
+		const std::string startTimeString = line.substr(0, semicolonPos);
 		std::smatch match;
-		fullCommand = line.substr(semicolon_pos + 1);
+		fullCommand = line.substr(semicolonPos + 1);
 
-		if(std::regex_match(startTimeString, match, time_match)) {
+		if(std::regex_match(startTimeString, match, timeMatch)) {
 			const int minutes = std::stoi(match[1]);
 			const int seconds = std::stoi(match[2]);
-			const int milli_seconds = std::stoi(match[3]);
-			startTime = minutes * 60000 + seconds * 1000 + milli_seconds;
+			const int milliseconds = std::stoi(match[3]);
+			startTime = minutes * 60000 + seconds * 1000 + milliseconds * 10;	// 少数部分の上2桁を取るので10倍することでミリ秒に修正
 		} else {
 			return std::make_tuple(startTime, command, args);
 		}
@@ -52,7 +52,7 @@ std::tuple<Commands::StartTime, Commands::Command, Commands::Args> Commands::get
 }
 
 bool CommandSeparator::Commands::isCommand(const Command& command) {
-	const auto& commandList = getControlCommandList();
+	const auto commandList = getControlCommandList();
 	const auto hash = Hash::getHash(command.c_str());
 	for(const auto& command : commandList) {
 		if(hash == static_cast<decltype(hash)>(command)) {
@@ -181,7 +181,7 @@ Mouse::ClickButtonArgs Mouse::getClickButtonArgs(const Commands::Args& args) {
 	const ClickButton& button = splitArgs[0];
 	const CursolPosX& x = std::stoi(splitArgs[1]);
 	const CursolPosY& y = std::stoi(splitArgs[2]);
-	const Common::PushTime time = splitArgs.size() > 3 ? std::stoi(splitArgs[3]) : -1;
+	const Common::PushTime time = splitArgs.size() > 3 ? std::stoi(splitArgs[3]) : 0;
 	return ClickButtonArgs(button, x, y, time);
 }
 
@@ -195,6 +195,23 @@ Mouse::CursolArgs Mouse::getCursorArgs(const Commands::Args& args) {
 	const Acction& action = splitArgs[0];
 	const CursolPosX& x = std::stoi(splitArgs[1]);
 	const CursolPosY& y = std::stoi(splitArgs[2]);
-	const Common::PushTime time = splitArgs.size() > 3 ? std::stoi(splitArgs[3]) : -1;
+	const Common::PushTime time = splitArgs.size() > 3 ? std::stoi(splitArgs[3]) : 0;
 	return CursolArgs(action, x, y, time);
+}
+
+std::vector<ControlCommand> CommandSeparator::getControlCommandList(void) {
+	return {
+		ControlCommand::GAMEPAD_STICK,
+		ControlCommand::GAMEPAD_BUTTON,
+		ControlCommand::KEY_DOWN,
+		ControlCommand::SPECIAL_KEY_DOWN,
+		ControlCommand::MOUSE_CURSOR,
+		ControlCommand::MOUSE_CLICK,
+		ControlCommand::MOUSE_SCROLL,
+		ControlCommand::IF,
+		ControlCommand::FI,
+		ControlCommand::ELSE,
+		ControlCommand::CAPTURE,
+		ControlCommand::STRING,
+	};
 }

@@ -6,8 +6,8 @@
 class IntAutoKeyboardOperator : public IntAutoOperator {
 public:
 	virtual ~IntAutoKeyboardOperator(void) noexcept = default;
-	virtual void onCommandKeyDown(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
-	virtual void onCommandString(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
+	virtual void onCommandKeyDown(const CommonAutoOperator::ElapsedTime& elapsedTime, const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
+	virtual void onCommandString(const CommonAutoOperator::ElapsedTime& elapsedTime, const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) = 0;
 };
 
 #endif
