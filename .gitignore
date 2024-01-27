@@ -4,6 +4,7 @@ out/
 CMakeFiles/
 
 
+Makefile
 *.dll
 *.user
 *.txt
