@@ -1,7 +1,7 @@
+#include <iostream>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/extensions/XTest.h>
-#include <iostream>
 #include "AutoKeyboardOperatorForLinux.h"
 #include "../Common/Hash.hpp"
 

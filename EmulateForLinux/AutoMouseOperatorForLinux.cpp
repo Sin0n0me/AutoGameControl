@@ -1,5 +1,4 @@
 #include <X11/Xlib.h>
-#include <X11/keysym.h>
 #include <X11/extensions/XTest.h>
 #include <iostream>
 #include "AutoMouseOperatorForLinux.h"
@@ -34,7 +33,7 @@ void AutoMouseOperatorForLinux::onCommandMouseCursor(const CommonAutoOperator::E
 	const auto& time = std::get<3>(splitArgs);
 
 	if(action == "Move") {
-		XWarpPointer(this->display, None, XRootWindow(display, 0), 0, 0, 0, 0, x, y); 
+		XWarpPointer(this->display, None, XRootWindow(this->display, 0), 0, 0, 0, 0, x, y); 
 	}
 
 }

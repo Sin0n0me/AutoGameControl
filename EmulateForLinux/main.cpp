@@ -1,14 +1,12 @@
 #include <iostream>
+#include <X11/cursorfont.h>
 #include "../Common/AutoOperator.hpp"
 #include "AutoGamePadOperatorForLinux.h"
 #include "AutoKeyboardOperatorForLinux.h"
 #include "AutoMouseOperatorForLinux.h"
 
-
 int main(void) {
-
 	std::cout << "Target DISPLAY: " << getenv("DISPLAY") << std::endl;
-
 	Display* const display = XOpenDisplay(NULL);
 	AutoOperator autoOperator;
 
@@ -20,9 +18,12 @@ int main(void) {
 		return 1;
 	}
 
+	// カーソルを表示する
+	XUndefineCursor(display, XRootWindow(display, 0));
+
 	autoOperator.run();
 
-	XCloseDisplay(display); 
+	XCloseDisplay(display);
 
 	return 0;
 }
