@@ -1,8 +1,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/extensions/XTest.h>
-
+#include <iostream>
 #include "AutoMouseOperatorForLinux.h"
+
 using namespace CommandSeparator;
 
 AutoMouseOperatorForLinux::AutoMouseOperatorForLinux(Display* const display) : display(display) {
