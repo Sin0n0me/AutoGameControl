@@ -14,6 +14,7 @@ endif()
 
 # パッケージの追加
 find_package(X11 REQUIRED)
+find_package(Threads REQUIRED)
 
 # ソースファイルの追加
 set(SOURCES
@@ -41,6 +42,6 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # パッケージの追加
-target_link_libraries(${PROJECT_NAME} ${X11_LIBRARIES} ${X11_XTest_LIB})
+target_link_libraries(${PROJECT_NAME} ${X11_LIBRARIES} ${X11_XTest_LIB} -pthread)
 target_include_directories(${PROJECT_NAME} PRIVATE ..)
 
