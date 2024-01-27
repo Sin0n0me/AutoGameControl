@@ -18,19 +18,8 @@ int main(void) {
 		return 1;
 	}
 
-	// カーソル作成
-	Window window = XRootWindow(display, 0);
-	Pixmap cursorPixmap = XCreatePixmap(display, window, 16, 16, 1);
-	XColor fg, bg;
-	const int screen = DefaultScreen(display);
-	const auto black = BlackPixel(display, screen); 
-	const auto white = WhitePixel(display, screen); 
-	fg.pixel = black;
-	bg.pixel = white;
-	Cursor cursor = XCreatePixmapCursor(display, cursorPixmap, cursorPixmap, &fg, &bg, 0, 0);
-
-	// ウィンドウにカーソルをセット
-	XDefineCursor(display, window, cursor);
+	// カーソルを表示する
+	XUndefineCursor(display, XRootWindow(display, 0));
 
 	autoOperator.run();
 
