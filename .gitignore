@@ -12,3 +12,5 @@ CMakeFiles/
 *.py
 
 
+!CMakeLists.txt
+
