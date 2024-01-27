@@ -70,7 +70,8 @@ int AutoKeyboardOperatorForLinux::getModifyKey(const CommandSeparator::KeyBoard:
 }
 
 bool AutoKeyboardOperatorForLinux::initialize(void) {
-	if(!this->display) {
+	if(this->display == NULL) {
+		std::cout << "ŠÂ‹«•Ï” DISPLAY ‚ªÝ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ." << std::endl;
 		return false;
 	}
 
