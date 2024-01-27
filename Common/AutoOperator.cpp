@@ -1,7 +1,7 @@
 #include <iostream>
 #include "AutoOperator.hpp"
 
-AutoOperator::AutoOperator(void) : programStartTime(std::chrono::high_resolution_clock::now()) {
+AutoOperator::AutoOperator(void) : programStartTime(std::chrono::system_clock::now()) {
 	this->useBufferIndex = 0;
 	this->currentRow = 0;
 	this->isFileLoadingCompleted = false;
@@ -176,8 +176,8 @@ void AutoOperator::loadFile(void) {
 		subBufferList.emplace_back(commands);
 	}
 
+#ifdef _DEBUG
 	const auto diff = std::chrono::high_resolution_clock::now() - loadStartTime;
-
 	std::cout << "================================" << std::endl;
 	std::cout << "ファイル読み込み完了" << std::endl;
 	std::cout << "更新バッファインデックス: " << static_cast<int>(unusedBufferIndex) << std::endl;
@@ -186,6 +186,7 @@ void AutoOperator::loadFile(void) {
 	std::cout << "読み取りコマンド数: " << subBufferList.size() << std::endl;
 	std::cout << "読み取り時間: " << std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() << "ms" << std::endl;
 	std::cout << "================================" << std::endl;
+#endif // _DEBUG
 }
 
 void AutoOperator::autoControl(const BufferList& lines) {
@@ -220,11 +221,14 @@ void AutoOperator::autoControl(const BufferList& lines) {
 		// コマンドに応じ自動操作実行
 		this->executeCommand(command, args);
 
+#ifdef _DEBUG
 		constexpr double fps = 1.0f / AutoOperator::MaxFrameRate * 1000;
 		if(static_cast<double>(delayTime) > fps) {
+			// 出力を別スレッドで行ってリリースでもログ出力してもいいかも?
 			std::cout << "[遅延発生!] 遅延時間:" << delayTime << " ms" << std::endl;
 			std::cout << "time: " << startTime << " command: " << command << " args:" << args << std::endl;
 		}
+#endif // _DEBUG
 	}
 }
 
@@ -276,7 +280,7 @@ bool AutoOperator::isSkipAutoControl(const CommandSeparator::Commands::Command& 
 
 CommonAutoOperator::ElapsedTime AutoOperator::getElapsedTime(void) const {
 	const auto startTime = this->programStartTime;
-	const auto currentTime = std::chrono::high_resolution_clock::now();
+	const auto currentTime = std::chrono::system_clock::now();
 	const auto diff = currentTime - startTime;
 	const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
 	return elapsedTime;

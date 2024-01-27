@@ -29,7 +29,9 @@ private:
 	std::unique_ptr<IntAutoKeyboardOperator> keyboardOperator;
 	std::unique_ptr<IntAutoMouseOperator> mouseOperator;
 
-	const std::chrono::steady_clock::time_point programStartTime;
+	// std::chrono::steady_clock::time_point ÇæÇ∆É_ÉÅ
+	// https://stackoverflow.com/questions/48628065/operator-between-two-stdchronotime-point-cause-error
+	const std::chrono::system_clock::time_point programStartTime;
 	std::thread fileLoadThread;
 	std::mutex mutex;
 	BufferList bufferList[MaxBufferList];
@@ -58,17 +60,17 @@ public:
 	explicit AutoOperator(void);
 	virtual ~AutoOperator(void) noexcept;
 
-	template <class GamePadOperator>
-	void registerGamePadOperator(void) {
-		this->gamePadOperator = std::make_unique<GamePadOperator>();
+	template <class GamePadOperator, class ...Args>
+	void registerGamePadOperator(const Args&... args) {
+		this->gamePadOperator = std::make_unique<GamePadOperator>(args...);
 	}
-	template <class KeyboardOperator>
-	void registerKeyboardOperator(void) {
-		this->keyboardOperator = std::make_unique<KeyboardOperator>();
+	template <class KeyboardOperator, class ...Args>
+	void registerKeyboardOperator(const Args&... args) {
+		this->keyboardOperator = std::make_unique<KeyboardOperator>(args...);
 	}
-	template <class MouseOperator>
-	void registerMouseOperator(void) {
-		this->mouseOperator = std::make_unique<MouseOperator>();
+	template <class MouseOperator, class ...Args>
+	void registerMouseOperator(const Args&... args) {
+		this->mouseOperator = std::make_unique<MouseOperator>(args...);
 	}
 
 	bool initialize(void);

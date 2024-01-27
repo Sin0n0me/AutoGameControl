@@ -1,6 +1,14 @@
 .vs/
 x64/
+out/
+CMakeFiles/
+
 
 *.dll
 *.user
 *.txt
+*.cmake
+*.json
+*.py
+
+
