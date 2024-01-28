@@ -34,6 +34,7 @@ void AutoMouseOperatorForLinux::onCommandMouseCursor(const CommonAutoOperator::E
 
 	if(action == "Move") {
 		XWarpPointer(this->display, None, XRootWindow(this->display, 0), 0, 0, 0, 0, x, y); 
+		XFlush(this->display);
 	}
 
 }

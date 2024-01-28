@@ -18,7 +18,7 @@ int main(void) {
 		return 1;
 	}
 
-	// カーソルを表示する
+	// カーソルを親ウィンドウの情報に戻す
 	XUndefineCursor(display, XRootWindow(display, 0));
 
 	autoOperator.run();
