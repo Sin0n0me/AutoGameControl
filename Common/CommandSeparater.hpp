@@ -28,23 +28,7 @@ namespace CommandSeparator {
 		FI = Hash::getHash("fi"),
 	};
 
-	std::vector<ControlCommand> getControlCommandList(void) {
-		std::vector<ControlCommand> vec = {
-			ControlCommand::GAMEPAD_STICK,
-			ControlCommand::GAMEPAD_BUTTON,
-			ControlCommand::KEY_DOWN,
-			ControlCommand::SPECIAL_KEY_DOWN,
-			ControlCommand::MOUSE_CURSOR,
-			ControlCommand::MOUSE_CLICK,
-			ControlCommand::MOUSE_SCROLL,
-			ControlCommand::IF,
-			ControlCommand::FI,
-			ControlCommand::ELSE,
-			ControlCommand::CAPTURE,
-			ControlCommand::STRING,
-		};
-		return vec;
-	}
+	std::vector<ControlCommand> getControlCommandList(void);
 
 	namespace Common {
 		using PushTime = int;

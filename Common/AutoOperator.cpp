@@ -1,13 +1,74 @@
 #include <iostream>
 #include "AutoOperator.hpp"
 
-AutoOperator::AutoOperator(void) : programStartTime(std::chrono::high_resolution_clock::now()) {
+AutoOperator::AutoOperator(void) : programStartTime(std::chrono::system_clock::now()) {
 	this->useBufferIndex = 0;
 	this->currentRow = 0;
 	this->isFileLoadingCompleted = false;
 	this->ifNestCounter = 0;
 
+	// 初期読み込み&バッファスワップ
 	this->loadFile();
+	this->swapBuffer();
+
+	// コマンドに応じた関数の登録
+
+	// ゲームパッドのジョイスティック操作
+	using namespace CommandSeparator;
+	this->registerCommandFunc(ControlCommand::GAMEPAD_STICK,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->gamePadOperator->onCommandGamePadStick(elapsedTime, command, args);
+		}
+	);
+
+	// ゲームパッドのボタン操作
+	this->registerCommandFunc(ControlCommand::GAMEPAD_BUTTON,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->gamePadOperator->onCommandGamePadButton(elapsedTime, command, args);
+		}
+	);
+
+	// キーボードのキー操作
+	this->registerCommandFunc(ControlCommand::KEY_DOWN,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->keyboardOperator->onCommandKeyDown(elapsedTime, command, args);
+		}
+	);
+
+	// キーボードのキー操作(装飾キー)
+	this->registerCommandFunc(ControlCommand::SPECIAL_KEY_DOWN,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->keyboardOperator->onCommandKeyDown(elapsedTime, command, args);
+		}
+	);
+
+	// キーボードの文字列入力操作
+	this->registerCommandFunc(ControlCommand::STRING,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->keyboardOperator->onCommandString(elapsedTime, command, args);
+		}
+	);
+
+	// マウスのカーソル操作
+	this->registerCommandFunc(ControlCommand::MOUSE_CURSOR,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->mouseOperator->onCommandMouseCursor(elapsedTime, command, args);
+		}
+	);
+
+	// マウスのクリック操作
+	this->registerCommandFunc(ControlCommand::MOUSE_CLICK,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->mouseOperator->onCommandMouseClick(elapsedTime, command, args);
+		}
+	);
+
+	// マウスのスクロール操作
+	this->registerCommandFunc(ControlCommand::MOUSE_SCROLL,
+		[this](const CommonAutoOperator::ElapsedTime& elapsedTime, const Commands::Command& command, const Commands::Args& args) {
+			this->mouseOperator->onCommandMouseScroll(elapsedTime, command, args);
+		}
+	);
 }
 
 AutoOperator::~AutoOperator(void) noexcept {
@@ -63,6 +124,10 @@ unsigned char AutoOperator::getIndexOfUnusedBuffer(void) const {
 	return this->useBufferIndex == 0 ? 1 : 0;
 }
 
+void AutoOperator::registerCommandFunc(const CommandSeparator::ControlCommand& command, const Func& func) {
+	this->commandFunc[static_cast<Hash::HashType>(command)] = func;
+}
+
 void AutoOperator::swapBuffer(void) {
 	std::lock_guard lock{this->mutex};
 
@@ -71,15 +136,21 @@ void AutoOperator::swapBuffer(void) {
 }
 
 void AutoOperator::loadFile(void) {
+	// 全て読み込み完了した場合は何もしない
+	if(this->isFileLoadingCompleted) {
+		return;
+	}
+
 	std::lock_guard lock{this->mutex};
 
+	const auto loadStartTime = std::chrono::high_resolution_clock::now();
 	const auto startLinePos = this->currentRow;
 	const auto endLinePos = this->currentRow + AutoOperator::MaxLoadLines;
-	this->currentRow += AutoOperator::MaxLoadLines;
 	CommandSeparator::Common::CommandLines tempListBuffer;
 
 	// 特定の範囲内の行を読み込み
-	readLines(tempListBuffer, AutoOperator::FilePath, startLinePos, endLinePos);
+	readLines(tempListBuffer, AutoOperator::FilePath, startLinePos, endLinePos - 1);
+	this->currentRow += tempListBuffer.size();
 
 	// 何も読み込めなければ全て読み込み完了
 	if(tempListBuffer.empty()) {
@@ -87,7 +158,8 @@ void AutoOperator::loadFile(void) {
 	}
 
 	// コマンドの分離など前処理
-	auto& subBufferList = this->bufferList[this->getIndexOfUnusedBuffer()];
+	const auto unusedBufferIndex = this->getIndexOfUnusedBuffer();
+	auto& subBufferList = this->bufferList[unusedBufferIndex];
 	for(const auto& line : tempListBuffer) {
 		const auto& commands = CommandSeparator::Commands::getCommand(line);
 		const auto& startTime = std::get<0>(commands);
@@ -98,13 +170,23 @@ void AutoOperator::loadFile(void) {
 		if(!CommandSeparator::Commands::isCommand(command)) {
 			continue;
 		}
+		//std::cout << "start time: " << static_cast<long long>(startTime) << " command: " << command << " args:" << args << std::endl;
 
 		// コマンドと認識できるもののみ追加
 		subBufferList.emplace_back(commands);
 	}
 
-	std::cout << subBufferList.size() << std::endl;
+#ifdef _DEBUG
+	const auto diff = std::chrono::high_resolution_clock::now() - loadStartTime;
+	std::cout << "================================" << std::endl;
 	std::cout << "ファイル読み込み完了" << std::endl;
+	std::cout << "更新バッファインデックス: " << static_cast<int>(unusedBufferIndex) << std::endl;
+	std::cout << "現在の読み取り行: " << this->currentRow << std::endl;
+	std::cout << "読み取り行数: " << tempListBuffer.size() << std::endl;
+	std::cout << "読み取りコマンド数: " << subBufferList.size() << std::endl;
+	std::cout << "読み取り時間: " << std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() << "ms" << std::endl;
+	std::cout << "================================" << std::endl;
+#endif // _DEBUG
 }
 
 void AutoOperator::autoControl(const BufferList& lines) {
@@ -119,8 +201,6 @@ void AutoOperator::autoControl(const BufferList& lines) {
 		const auto& command = std::get<1>(commands);
 		const auto& args = std::get<2>(commands);
 
-		std::cout << "time:" << startTime << " command:" << command << " args:" << args << std::endl;
-
 		// 条件式等によりスキップするかどうか判定
 		if(this->isSkipAutoControl(command, args)) {
 			continue;
@@ -133,43 +213,31 @@ void AutoOperator::autoControl(const BufferList& lines) {
 				autoOperator->update(elapsedTime);
 			}
 			elapsedTime = this->getElapsedTime();
-		} while(startTime > elapsedTime.count());
+		} while(static_cast<long long>(startTime - 1) > elapsedTime.count());
+
+		// 時間計測
+		const auto delayTime = elapsedTime.count() - startTime;
 
 		// コマンドに応じ自動操作実行
 		this->executeCommand(command, args);
+
+#ifdef _DEBUG
+		constexpr double fps = 1.0f / AutoOperator::MaxFrameRate * 1000;
+		if(static_cast<double>(delayTime) > fps) {
+			// 出力を別スレッドで行ってリリースでもログ出力してもいいかも?
+			std::cout << "[遅延発生!] 遅延時間:" << delayTime << " ms" << std::endl;
+			std::cout << "time: " << startTime << " command: " << command << " args:" << args << std::endl;
+		}
+#endif // _DEBUG
 	}
 }
 
 void AutoOperator::executeCommand(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) const {
 	const auto commandHash = Hash::getHash(command.c_str());
+	const auto elapsedTime = this->getElapsedTime();
 
 	// 各コマンドに応じた自動操作を行う
-	switch(commandHash) {
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::GAMEPAD_STICK):
-		this->gamePadOperator->onCommandGamePadStick(command, args);	// ゲームパッドのジョイスティック操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::GAMEPAD_BUTTON):
-		this->gamePadOperator->onCommandGamePadButton(command, args);	// ゲームパッドのボタン操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::KEY_DOWN):
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::SPECIAL_KEY_DOWN):
-		this->keyboardOperator->onCommandKeyDown(command, args);		// キーボードのキー操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::MOUSE_CURSOR):
-		this->mouseOperator->onCommandMouseCursor(command, args);		// マウスのカーソル操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::MOUSE_CLICK):
-		this->mouseOperator->onCommandMouseClick(command, args);		// マウスのクリック操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::MOUSE_SCROLL):
-		this->mouseOperator->onCommandMouseScroll(command, args);		// マウスのスクロール操作
-		return;
-	case static_cast<Hash::HashType>(CommandSeparator::ControlCommand::STRING):
-		this->keyboardOperator->onCommandString(command, args);			// キーボードの文字入力操作
-		return;
-	default:
-		break;
-	}
+	this->commandFunc.at(commandHash)(elapsedTime, command, args);
 }
 
 bool AutoOperator::isSkipAutoControl(const CommandSeparator::Commands::Command& command, const CommandSeparator::Commands::Args& args) {
@@ -212,7 +280,7 @@ bool AutoOperator::isSkipAutoControl(const CommandSeparator::Commands::Command& 
 
 CommonAutoOperator::ElapsedTime AutoOperator::getElapsedTime(void) const {
 	const auto startTime = this->programStartTime;
-	const auto currentTime = std::chrono::high_resolution_clock::now();
+	const auto currentTime = std::chrono::system_clock::now();
 	const auto diff = currentTime - startTime;
 	const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
 	return elapsedTime;
